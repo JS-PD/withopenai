@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Q&A</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        #response { margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <h1>Simple Q&A with OpenAI</h1>
+    <p>Enter your question and get an answer from OpenAI's GPT model.</p>
+    <input type="text" id="question" placeholder="Ask a question" size="50" />
+    <button id="ask">Ask</button>
+    <pre id="response"></pre>
+
+    <script>
+    document.getElementById('ask').addEventListener('click', async () => {
+        const question = document.getElementById('question').value;
+        const apiKey = 'YOUR_OPENAI_API_KEY'; // Replace with your OpenAI API key
+        const responseElem = document.getElementById('response');
+        responseElem.textContent = 'Loading...';
+
+        try {
+            const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [{ role: 'user', content: question }]
+                })
+            });
+
+            if (!res.ok) {
+                throw new Error('API request failed');
+            }
+
+            const data = await res.json();
+            const answer = data.choices[0].message.content.trim();
+            responseElem.textContent = answer;
+        } catch (err) {
+            responseElem.textContent = 'Error: ' + err.message;
+        }
+    });
+    </script>
+</body>
+</html>
